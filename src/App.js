@@ -1,24 +1,46 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState } from "react";
+import { useEffect } from "react";
+import Login from "./components/login/Login.jsx";
+import MainContent from "./components/MainContent/MainContent.jsx";
+import Header from "./components/header/Header";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [currentPage, setCurrentPage] = useState("users");
+
+  const handleNavigationClick = (page) => {
+    setCurrentPage(page);
+  };
+
+  useEffect(() => {
+    const storageUserLoggedInfo = localStorage.getItem("isLogin");
+    if (storageUserLoggedInfo === "1") {
+      setIsLoggedIn("true");
+    }
+  }, []);
+
+  const loginHandler = (email, password) => {
+    localStorage.setItem("isLogin", "1");
+    setIsLoggedIn(true);
+  };
+
+  const logoutHandler = () => {
+    localStorage.removeItem("isLogin");
+    setIsLoggedIn(false);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <React.Fragment>
+      <Header
+        onChangePage={handleNavigationClick}
+        isAuthenticated={isLoggedIn}
+        onLogout={logoutHandler}
+      />
+      <main>
+        {!isLoggedIn && <Login onLogin={loginHandler} />}
+        {isLoggedIn && <MainContent currentPage={currentPage} />}
+      </main>
+    </React.Fragment>
   );
 }
 
